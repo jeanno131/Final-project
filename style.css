@@ -1,0 +1,560 @@
+/* style.css - All Website Styling Combined (Modules 3, 4, 5) */
+
+/* Import the Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --nike-red: #E60023;
+    --nike-dark: #1a202c; /* Updated from #111 to match new snippets' dark color */
+    --nike-light: #f8fafc; /* Updated from #f5f5f5 to match new snippets' light color */
+    --text-color: #1a202c; /* Updated from #333 to match new snippets' dark text */
+    --blue-accent: #3b82f6; /* New blue accent color */
+}
+
+/* Apply Inter font family to the body and general styling */
+body {
+    font-family: 'Inter', sans-serif; /* Applied Inter font */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--nike-light); /* Light background for the page */
+    color: var(--text-color); /* Dark text for readability */
+    line-height: 1.6;
+}
+
+/* --- Login Page Specific Styles --- */
+
+/* Ensure the login page is centered */
+html, body.login-body { /* Targets the body specifically for the login page */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Background image for login page using the provided URL */
+    background-image: url('https://media.about.nike.com/img/cf68f541-fc92-4373-91cb-086ae0fe2f88/002-nike-logos-swoosh-white.jpg?m=eyJlZGl0cyI6eyJqcGVnIjp7InF1YWxpdHkiOjEwMH0sIndlYnAiOnsicXVhbGl0eSI6MTAwfSwiZXh0cmFjdCI6eyJsZWZ0IjowLCJ0b3AiOjAsIndpZHRoIjo1MDAwLCJoZWlnaHQiOjI4MTN9LCJyZXNpemUiOnsid2lkdGgiOjE5MjB9fX0%3D&s=aa2b1811d4e185eaa5538fac73fcfc1db9f4823d3ba2a146a188c7cef1bd96ee');
+    background-size: cover;
+    background-position: center;
+    background-color: #f0f0f0; /* Fallback */
+    flex-direction: column; /* Allows message box to stack above login form */
+}
+
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Module 3: box-shadow */
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    /* Removed margin: auto; as flexbox on body handles centering */
+}
+
+.login-container h1 {
+    color: var(--nike-red); /* Nike Red */
+    margin-bottom: 10px;
+    font-size: 2em; /* Module 5: Typography */
+}
+
+.login-container h2 {
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.5em;
+}
+
+.login-container .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.login-container button[type="submit"] {
+    background-color: var(--nike-red); /* Nike Red */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.login-container button[type="submit"]:hover {
+    background-color: #C0001D; /* Darker Nike Red on hover */
+}
+
+.login-container .login-hint {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* Style for the message box (Login Page) */
+.message-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f8d7da; /* Default error color */
+    color: #721c24; /* Default error text color */
+    padding: 15px 25px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; /* Hidden by default */
+    z-index: 1000;
+    text-align: center;
+    font-weight: bold;
+}
+.message-box.show {
+    display: block;
+    animation: fadeInOut 3s forwards;
+}
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+
+/* --- General Website Styling (for index.html, about page.html, product page.html) --- */
+
+/* General styling for fixed navigation bar */
+/* The main-nav is fixed, so body needs padding-top to prevent content from going under it */
+body:not(.login-body) { /* Apply this padding to bodies that are not the login page */
+    padding-top: 96px; /* Adjusted padding-top to match nav height (py-4 + h-8 logo + some buffer) */
+}
+
+header {
+    background-color: var(--nike-dark);
+    color: white;
+    padding: 15px 0;
+    position: fixed; /* Ensures header stays at the top */
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensures header is above other content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.main-nav ul li {
+    margin-left: 30px;
+}
+
+.main-nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.main-nav ul li a:hover {
+    color: var(--nike-red);
+}
+
+/* Hero section background image - Nike theme */
+.hero-background { /* Applied to .hero-section in index.html */
+    background-image: url('https://placehold.co/1200x600/1a202c/ffffff?text=NIKE+HERO+IMAGE'); /* Placeholder for a Nike-themed hero image */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    width: 100%;
+    height: 600px; /* Adjust as needed */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+/* No need for .hero-image anymore as background-image is on .hero-background */
+
+
+.hero-content {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 40px;
+    border-radius: 8px;
+}
+
+.hero-content h1 {
+    font-size: 4em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.hero-content p {
+    font-size: 1.5em;
+    margin-bottom: 30px;
+}
+
+.button {
+    display: inline-block;
+    background-color: var(--nike-red);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #C0001D;
+}
+
+/* Category Grid (Homepage) (Module 3, 4, 5) */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Module 4: Responsive grid */
+    gap: 30px;
+    padding: 50px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.category-card { /* Renamed from .category-item */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Category card hover effect */
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.category-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.category-card h3 {
+    margin: 15px 0;
+    font-size: 1.5em;
+    color: var(--nike-dark);
+}
+
+.sale-highlight {
+    border: 2px solid var(--nike-red);
+    animation: pulse 1.5s infinite; /* Simple animation for sale, related to Module 5 micro-interactions */
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 0, 35, 0.7); }
+    70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(230, 0, 35, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 0, 35, 0); }
+}
+
+/* About Page Specifics (Module 3, 5) */
+.about-main {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.about-hero {
+    background-color: var(--nike-dark);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.about-hero h1 {
+    font-size: 3em;
+    margin: 0;
+}
+
+.about-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    text-align: center; /* Center profile image and text */
+}
+
+/* Profile image styling for About page */
+.profile-image {
+    border-radius: 50%; /* Circular image */
+    border: 4px solid var(--blue-accent); /* Blue border */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 150px; /* Example size */
+    height: 150px; /* Example size */
+    object-fit: cover;
+    margin-bottom: 30px; /* Space below image */
+}
+
+.about-content h3 {
+    color: var(--nike-red);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+/* Product Page Specifics (Module 3, 4, 5) */
+.product-main {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.product-main h1 {
+    text-align: center;
+    font-size: 3em;
+    color: var(--nike-dark);
+    margin-bottom: 50px;
+}
+
+.product-category {
+    margin-bottom: 60px;
+    padding-top: 20px; /* For anchor links to scroll correctly */
+}
+
+.product-category h2 {
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--nike-red);
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--nike-red);
+    display: inline-block;
+    padding-bottom: 10px;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    display: block; /* To center the inline-block */
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Module 4: Responsive grid */
+    gap: 30px;
+}
+
+.product-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.product-card h3 {
+    font-size: 1.3em;
+    color: var(--nike-dark);
+    margin: 0 15px 10px;
+}
+
+.product-card p {
+    font-size: 0.95em;
+    color: #666;
+    margin: 0 15px 15px;
+}
+
+.product-card .price {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--nike-red);
+    display: block;
+    margin-bottom: 15px;
+}
+
+.product-card .price del {
+    color: #999;
+    font-size: 0.8em;
+    margin-right: 5px;
+}
+
+.button-small {
+    display: inline-block;
+    background-color: var(--nike-dark);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.button-small:hover {
+    background-color: var(--nike-red);
+}
+
+.sale-section .product-card {
+    border: 2px solid var(--nike-red); /* Highlight sale items */
+}
+
+
+/* Footer (Module 3, 5) */
+footer {
+    background-color: var(--nike-dark);
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+    font-size: 0.9em;
+}
+
+/* --- Responsive Adjustments (Module 4) --- */
+
+@media screen and (max-width: 768px) {
+    /* Login Page Responsive */
+    .login-container {
+        margin: 20px; /* Add some margin on smaller screens */
+        padding: 30px;
+    }
+    .login-container h1 {
+        font-size: 1.8em;
+    }
+    .login-container h2 {
+        font-size: 1.3em;
+    }
+
+
+    /* General Site Responsive */
+    body:not(.login-body) {
+        padding-top: 70px; /* Adjust padding for smaller fixed header */
+    }
+    .main-nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .main-nav ul {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .main-nav ul li {
+        margin: 0 15px 10px;
+    }
+
+    .hero-content h1 {
+        font-size: 3em;
+    }
+
+    .hero-content p {
+        font-size: 1.2em;
+    }
+
+    .category-grid, .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .product-category h2 {
+        font-size: 2em;
+    }
+
+    .about-content, .product-main {
+        padding: 0 15px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Login Page Responsive */
+    .login-container {
+        padding: 20px;
+    }
+    .login-container h1 {
+        font-size: 1.5em;
+    }
+    .login-container h2 {
+        font-size: 1.1em;
+    }
+
+    /* General Site Responsive */
+    .main-nav ul li {
+        margin: 0 10px 10px;
+    }
+
+    .hero-section {
+        height: 400px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5em;
+    }
+
+    .hero-content p {
+        font-size: 1em;
+    }
+
+    .button {
+        padding: 12px 25px;
+        font-size: 0.9em;
+    }
+
+    .category-grid, .product-grid {
+        grid-template-columns: 1fr; /* Stack items on very small screens */
+    }
+
+    .product-category h2 {
+        font-size: 1.8em;
+    }
+}

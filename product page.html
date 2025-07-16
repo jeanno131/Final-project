@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nike Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Ensure body has no default margin to prevent overlap issues */
+        body {
+            margin: 0;
+            padding: 0; /* Ensure no default padding on body */
+            overflow-x: hidden; /* Prevent horizontal scroll from modal */
+        }
+        /* Adjust padding-top for the main content to clear the fixed navigation bar */
+        #products-page-content {
+            padding-top: 96px; /* Increased padding to ensure content is visible below the fixed nav */
+        }
+        /* Profile image styling for About page */
+        .profile-image {
+            border-radius: 50%; /* Circular image */
+            border: 4px solid #3b82f6; /* Blue border */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Style for the message box (Login Page) - This is for a different message box if you had one */
+        /* You might want to rename this or keep it separate if it's used elsewhere */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden by default */
+            z-index: 1000;
+            text-align: center;
+            font-weight: bold;
+        }
+        .message-box.show {
+            display: block;
+            animation: fadeInOut 3s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 2000; /* Sit on top, higher than other elements */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px); /* Optional: blur background */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%; /* Adjust as needed */
+            max-width: 1000px; /* Max width for larger screens */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column; /* Stack content vertically on small screens */
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                flex-direction: row; /* Side-by-side on larger screens */
+            }
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .modal-gallery {
+            flex: 1.5; /* Takes more space for images */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-main-image-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 75%; /* 4:3 aspect ratio */
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: #e2e8f0; /* Light gray background for images */
+        }
+
+        .modal-main-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ensure the whole image is visible */
+            border-radius: 8px;
+        }
+
+        .modal-thumbnail-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+        }
+
+        .modal-thumbnail-gallery img {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+            background-color: #f0f4f8;
+        }
+
+        .modal-thumbnail-gallery img.active-thumb,
+        .modal-thumbnail-gallery img:hover {
+            border-color: #3b82f6; /* Blue border for active/hover */
+            transform: scale(1.05);
+        }
+
+        .modal-details {
+            flex: 1; /* Takes less space for details */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .modal-details h2 {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+
+        .modal-details .category {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .modal-details .price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #3b82f6; /* Blue for price */
+            margin-bottom: 20px;
+        }
+
+        .modal-details .description {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #4a5568;
+        }
+
+        .modal-size-selection label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+
+        .modal-size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .modal-size-option {
+            background-color: #e2e8f0;
+            border: 1px solid #cbd5e0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .modal-size-option:hover {
+            background-color: #d1e0f0;
+            border-color: #3b82f6;
+        }
+
+        .modal-size-option.selected-size {
+            background-color: #3b82f6; /* Blue for selected size */
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .modal-add-to-cart-btn {
+            background-color: #3b82f6; /* Blue button */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .modal-add-to-cart-btn:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+
+        /* Styles for the "Add to Cart" success message */
+        #addToCartMessage {
+            opacity: 0; /* Hidden by default */
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+            transition: opacity 0.3s ease-in-out; /* Smooth transition for showing/hiding */
+            text-align: center; /* Center the text */
+            min-width: 250px; /* Ensure it's wide enough */
+            /* Tailwind classes for green color */
+            background-color: #d4edda; /* bg-green-100 */
+            border: 1px solid #c3e6cb; /* border-green-400 */
+            color: #155724; /* text-green-700 */
+            position: fixed; /* Ensure it's fixed */
+            top: 20px; /* Position from top */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for true centering */
+            padding: 15px 25px; /* Padding */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            z-index: 5000; /* High z-index to be on top */
+        }
+
+        #addToCartMessage.show {
+            opacity: 1; /* Make visible */
+            pointer-events: auto; /* Enable interaction when visible */
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+    <!-- Message Box for "Successfully Added to Cart" -->
+    <div id="addToCartMessage">
+        <span id="messageText"></span>
+    </div>
+
+    <nav id="main-nav" class="fixed top-0 left-0 w-full bg-white shadow-md z-10">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-gray-800 flex items-center">
+                <img src="https://tse1.mm.bing.net/th/id/OIP.B2ttirLawywQ9rRebjoZ6QHaC6?pid=Api" alt="Nike Logo" class="h-8 w-13 mr-2 rounded">
+            </a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium transition duration-200">Home</a>
+                <a href="about page.html" class="text-gray-700 hover:text-blue-600 font-medium transition duration-200">About Nike</a>
+                <a href="product page.html" class="text-blue-600 hover:text-blue-600 font-medium transition duration-200">Products</a>
+                <a href="login page.html" class="text-gray-700 hover:text-blue-600 font-medium transition duration-200">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="products-page-content">
+        <section class="py-16 bg-white mx-4 mt-8 rounded-xl shadow-lg">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl font-bold text-gray-900 text-center mb-12">Our Products</h1>
+
+                <div class="flex flex-wrap justify-center gap-4 mb-12">
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-blue-200 transition duration-200 font-medium" data-category="all">All Products</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-blue-200 transition duration-200 font-medium" data-category="shoes">Shoes</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-blue-200 transition duration-200 font-medium" data-category="clothing">Clothing</button>
+                    <button class="filter-btn bg-red-100 text-red-700 px-6 py-2 rounded-full hover:bg-red-200 transition duration-200 font-medium" data-category="sale">40% Off Sale</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-blue-200 transition duration-200 font-medium" data-category="accessories">Accessories</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-blue-200 transition duration-200 font-medium" data-category="equipment">Equipment</button>
+                </div>
+
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <!-- Shoes -->
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out shoes cursor-pointer" data-id="airmax270" data-name="Nike Air Max 270">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/60bc701c-a1b1-47f1-b2b3-33ee9d84860b/W+AIR+MAX+270.png" alt="Nike Air Max 270" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Air Max 270</h3>
+                            <p class="text-gray-600 text-sm mb-4">Experience ultimate comfort and style with the iconic Air Max 270. Perfect for everyday wear and light activities.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$150.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out shoes sale cursor-pointer" data-id="reactinfinity" data-name="Nike React Infinity Run Flyknit">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/246d7ca5-42b8-4196-8992-70ce0deb869e/W+NIKE+RUN+DEFY.png" alt="Nike React Infinity Run Flyknit" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike React Infinity Run Flyknit</h3>
+                            <p class="text-gray-600 text-sm mb-4">Engineered to help reduce injury and keep you running. Now 40% off!</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-red-600 line-through mr-2">$160.00</span><span class="text-lg font-bold text-blue-600">$96.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clothing -->
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out clothing cursor-pointer" data-id="drifittee" data-name="Nike Dri-FIT Training T-Shirt">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/8cfd3049-d062-4291-bd8e-3dceb7214361/AS+M+NP+DF+TIGHT+TOP+SS.png" alt="Nike Dri-FIT Tee" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Dri-FIT Training T-Shirt</h3>
+                            <p class="text-gray-600 text-sm mb-4">Stay dry and comfortable during your toughest workouts with sweat-wicking fabric.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$35.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out clothing sale cursor-pointer" data-id="techfleece" data-name="Nike Tech Fleece Hoodie">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7deb0efc-4a47-4ac3-8abf-ae49b4f33b50/AS+M+NK+TCH+FLC+FZ+WR+HOODIE.png" alt="Nike Tech Fleece Hoodie" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Tech Fleece Hoodie</h3>
+                            <p class="text-gray-600 text-sm mb-4">Lightweight warmth and premium style. Get it now at 40% off!</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-red-600 line-through mr-2">$120.00</span><span class="text-lg font-bold text-blue-600">$72.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accessories -->
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out accessories cursor-pointer" data-id="sportswearcap" data-name="Nike Sportswear Heritage86 Cap">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/1edfecd2-0987-47b5-af16-ef1f0ccfb22b/U+NK+DF+CLUB+CAP+S+CB+P.png" alt="Nike Sportswear Heritage86 Cap" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Sportswear Heritage86 Cap</h3>
+                            <p class="text-gray-600 text-sm mb-4">Classic comfort and adjustable fit for everyday wear.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$25.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out accessories cursor-pointer" data-id="nikesocks" data-name="Nike Everyday Cushioned Socks">
+                        <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/cb8d316e-795a-4a9b-99e6-e8e73a46c970/Y+NK+EVERYDY+CUSH+CREW+6PR+108.png" alt="Nike Everyday Cushioned Socks" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Everyday Cushioned Socks (3 Pair)</h3>
+                            <p class="text-gray-600 text-sm mb-4">Comfort and support for your feet, all day long.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$18.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment -->
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out equipment cursor-pointer" data-id="traininggloves" data-name="Nike Training Gloves">
+                        <img src="https://images.sportsdirect.com/images/imgzoom/76/76104003_xxl.jpg" alt="Nike Training Gloves" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Training Gloves</h3>
+                            <p class="text-gray-600 text-sm mb-4">Enhanced grip and protection for your workouts, designed for durability.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$40.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-item bg-gray-50 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out equipment cursor-pointer" data-id="waterbottle" data-name="Nike Sport Water Bottle">
+                        <img src="https://static-01.daraz.lk/p/e07a7f3ae93939f5ca528c50c031bf7f.jpg" alt="Nike Water Bottle" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nike Sport Water Bottle</h3>
+                            <p class="text-gray-600 text-sm mb-4">Stay hydrated with our durable and easy-to-carry water bottle.</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-lg font-bold text-blue-600">$15.00</span>
+                                <button class="add-to-cart-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-gray-300 py-8 text-center rounded-t-xl mx-4 mt-8">
+            <div class="container mx-auto px-4">
+                <p>&copy; 2025 Nike, Inc. All rights reserved.</p>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <a href="#" class="hover:text-white transition duration-200">Privacy Policy</a>
+                    <span class="text-gray-500">|</span>
+                    <a href="#" class="hover:text-white transition duration-200">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-gallery">
+                <div class="modal-main-image-container">
+                    <img id="modalMainProductImage" src="https://placehold.co/700x525/e2e8f0/64748b?text=Main+Image" alt="Main Product Image" class="modal-main-image">
+                </div>
+                <div class="modal-thumbnail-gallery" id="modalThumbnailGallery">
+                </div>
+            </div>
+
+            <div class="modal-details">
+                <h2 id="modalProductName">Product Name</h2>
+                <p class="category" id="modalProductCategory">Category: </p>
+                <p class="price" id="modalProductPrice">$0.00</p>
+                <p class="description" id="modalProductDescription">This is a detailed description of the product, highlighting its features, benefits, and unique selling points.</p>
+
+                <div class="modal-size-selection">
+                    <label for="modalProductSize">Select Size:</label>
+                    <div class="modal-size-options" id="modalSizeOptions">
+                    </div>
+                </div>
+
+                <button class="modal-add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product Data (in a real app, this would come from a database/API)
+        const products = {
+            "airmax270": {
+                name: "Nike Air Max 270",
+                category: "Shoes",
+                price: 150.00,
+                description: "Experience ultimate comfort and style with the iconic Air Max 270. Featuring Nike's largest heel Air unit, it delivers an unbelievably soft ride that feels as good as it looks. Perfect for everyday wear and light activities, blending heritage style with modern comfort.",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/60bc701c-a1b1-47f1-b2b3-33ee9d84860b/W+AIR+MAX+270.png", // Example front view
+                    top: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e2d01382-e9b3-436e-9378-a8a31dba76a2/W+AIR+MAX+270.png", // Example top view
+                    left: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e07987ed-96da-422f-beb4-8e9c7e120eb2/W+AIR+MAX+270.png", // Example left view
+                    right: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5f3330a6-433c-4b7b-9da9-d7c29b5d557c/W+AIR+MAX+270.png", // Example right view
+                    bottom: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/1a36f0e1-514e-49ae-8b42-49c9a9661b29/W+AIR+MAX+270.png", // Example bottom view
+                },
+                sizes: ["US 7", "US 7.5", "US 8", "US 8.5", "US 9", "US 9.5", "US 10", "US 10.5", "US 11", "US 12"]
+            },
+            "reactinfinity": {
+                name: "Nike React Infinity Run Flyknit",
+                category: "Shoes",
+                price: 160.00,
+                description: "Engineered to help reduce injury and keep you running. Experience soft, responsive cushioning and a wide outsole for a stable ride. Now 40% off!",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/246d7ca5-42b8-4196-8992-70ce0deb869e/W+NIKE+RUN+DEFY.png",
+                    top: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b9987b30-1db4-4162-bc04-6526c2e1a94e/W+NIKE+RUN+DEFY.png",
+                    side: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/71c044e6-b2e4-4989-b11a-0f850b1951be/W+NIKE+RUN+DEFY.png"
+                },
+                sizes: ["US 6", "US 7", "US 8", "US 9", "US 10", "US 11"]
+            },
+            "drifittee": {
+                name: "Nike Dri-FIT Training T-Shirt",
+                category: "Clothing",
+                price: 35.00,
+                description: "Stay dry and comfortable during your toughest workouts with sweat-wicking fabric. This tee features a lightweight, breathable design perfect for any athletic activity or casual wear.",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/8cfd3049-d062-4291-bd8e-3dceb7214361/AS+M+NP+DF+TIGHT+TOP+SS.png",
+                    back: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0b68a7cd-ad5a-4229-b4a9-371703cf7f6c/AS+M+NP+DF+TIGHT+TOP+SS.png",
+                    detail: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/441ca50f-47f4-4a83-b69e-7f17afa430e1/AS+M+NP+DF+TIGHT+TOP+SS.png"
+                },
+                sizes: ["S", "M", "L", "XL", "XXL"]
+            },
+            "techfleece": {
+                name: "Nike Tech Fleece Hoodie",
+                category: "Clothing",
+                price: 120.00,
+                description: "Lightweight warmth and premium style. The Nike Tech Fleece Hoodie is crafted from innovative fleece fabric that's soft on both sides, delivering warmth without extra bulk. Now 40% off!",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/7deb0efc-4a47-4ac3-8abf-ae49b4f33b50/AS+M+NK+TCH+FLC+FZ+WR+HOODIE.png",
+                    back: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/1e290747-7855-44bf-959f-d1494ee809ad/AS+M+NK+TCH+FLC+FZ+WR+HOODIE.png"
+                },
+                sizes: ["XS", "S", "M", "L", "XL"]
+            },
+            "sportswearcap": {
+                name: "Nike Sportswear Heritage86 Cap",
+                category: "Accessories",
+                price: 25.00,
+                description: "The Nike Sportswear H86 Cap features a six-panel design for classic comfort and an adjustable closure for a personalized fit. Made with durable cotton twill fabric.",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/1edfecd2-0987-47b5-af16-ef1f0ccfb22b/U+NK+DF+CLUB+CAP+S+CB+P.png",
+                    side: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/774b18ed-1f4e-453e-9d82-d6ae83122602/U+NK+DF+CLUB+CAP+S+CB+P.png",
+                    back: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/2fc0a167-aa7a-4273-8c05-53e3e3324e40/U+NK+DF+CLUB+CAP+S+CB+P.png"
+                },
+                sizes: ["One Size"]
+            },
+            "nikesocks": {
+                name: "Nike Everyday Cushioned Socks (3 Pair)",
+                category: "Accessories",
+                price: 18.00,
+                description: "Keep your feet comfortable and supported with the Nike Everyday Cushioned Socks, featuring thick terry sole for extra comfort and arch support for a snug fit.",
+                images: {
+                    front: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/cb8d316e-795a-4a9b-99e6-e8e73a46c970/Y+NK+EVERYDY+CUSH+CREW+6PR+108.png",
+                    detail: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/e092c5cd-629d-44fa-a846-a383c0b068a0/Y+NK+EVERYDY+CUSH+CREW+6PR+108.png"
+                },
+                sizes: ["S", "M", "L"]
+            },
+            "traininggloves": {
+                name: "Nike Training Gloves",
+                category: "Equipment",
+                price: 40.00,
+                description: "The Nike Training Gloves offer enhanced grip and protection for your hands during intense workouts. Features padded palms and adjustable wrist straps for comfort and support.",
+                images: {
+                    front: "https://images.sportsdirect.com/images/imgzoom/76/76104003_xxl.jpg",
+                    back: "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/718b54cb-bf9d-4086-86ac-8ae0b6becd6e/gym-classic-printed-training-gloves-sq9QpJ.png"
+                },
+                sizes: ["S", "M", "L", "XL"]
+            },
+            "waterbottle": {
+                name: "Nike Sport Water Bottle",
+                category: "Equipment",
+                price: 15.00,
+                description: "Stay hydrated with our durable and easy-to-carry water bottle. Designed for on-the-go hydration during workouts or daily activities.",
+                images: {
+                    front: "https://static-01.daraz.lk/p/e07a7f3ae93939f5ca528c50c031bf7f.jpg",
+                    side: "https://www.rebelsport.com.au/dw/image/v2/BBRV_PRD/on/demandware.static/-/Sites-srg-internal-master-catalog/default/dw5b1e16e5/images/529445/Rebel_529445_blue_hi-res.jpg?sw=1000&sh=1000&sm=fit"
+                },
+                sizes: ["24 oz", "32 oz"]
+            }
+            // Add more products as needed
+        };
+
+
+        // Function to filter products by category based on URL query parameters
+        function filterProductsFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            const productItems = document.querySelectorAll('.product-item');
+            let foundCategory = false; // To check if a category was filtered
+
+            productItems.forEach(item => {
+                if (category === 'all' || !category || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                    if (category) foundCategory = true; // Mark that a category filter was applied
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Highlight the active filter button
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.classList.remove('bg-blue-600', 'text-white');
+                button.classList.add('bg-gray-200', 'text-gray-800');
+                if (button.dataset.category === category || (!category && button.dataset.category === 'all')) {
+                    button.classList.add('bg-blue-600', 'text-white');
+                    button.classList.remove('bg-gray-200', 'text-gray-800');
+                }
+            });
+
+            // If no category was found or specified, default to 'all'
+            if (!foundCategory && category !== 'all' && category !== null) {
+                // This scenario means an invalid category was in the URL, revert to 'all'
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete('category'); // Remove invalid category
+                window.history.replaceState({ path: newUrl.href }, '', newUrl.href); // Replace state to clean URL
+                filterProductsFromUrl(); // Re-run filter with 'all'
+            }
+        }
+
+        // Event listeners for product category filter buttons
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const category = this.dataset.category;
+                const newUrl = new URL(window.location.href);
+                if (category === 'all') {
+                    newUrl.searchParams.delete('category');
+                } else {
+                    newUrl.searchParams.set('category', category);
+                }
+                window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+                filterProductsFromUrl();
+            });
+        });
+
+        // Run filter on page load
+        document.addEventListener('DOMContentLoaded', filterProductsFromUrl);
+
+
+        // --- Product Detail Modal Logic ---
+        const productDetailModal = document.getElementById('productDetailModal');
+        const closeButton = productDetailModal.querySelector('.close-button');
+        const modalMainProductImage = document.getElementById('modalMainProductImage');
+        const modalThumbnailGallery = document.getElementById('modalThumbnailGallery');
+        const modalProductName = document.getElementById('modalProductName');
+        const modalProductCategory = document.getElementById('modalProductCategory');
+        const modalProductPrice = document.getElementById('modalProductPrice');
+        const modalProductDescription = document.getElementById('modalProductDescription');
+        const modalSizeOptions = document.getElementById('modalSizeOptions');
+
+        // Function to open the modal and populate with product data
+        function openProductModal(productId) {
+            const product = products[productId];
+            if (!product) {
+                console.error("Product not found:", productId);
+                return;
+            }
+
+            modalProductName.textContent = product.name;
+            modalProductCategory.textContent = `Category: ${product.category}`;
+            modalProductPrice.textContent = `$${product.price.toFixed(2)}`;
+            modalProductDescription.textContent = product.description;
+
+            // Clear previous thumbnails and sizes
+            modalThumbnailGallery.innerHTML = '';
+            modalSizeOptions.innerHTML = '';
+
+            // Load Images
+            let firstImageKey = Object.keys(product.images)[0];
+            modalMainProductImage.src = product.images[firstImageKey];
+
+            for (const key in product.images) {
+                const imgUrl = product.images[key];
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = `${product.name} - ${key} view`;
+                img.classList.add('modal-thumbnail');
+                if (key === firstImageKey) {
+                    img.classList.add('active-thumb');
+                }
+                img.addEventListener('click', () => {
+                    modalMainProductImage.src = imgUrl;
+                    document.querySelectorAll('.modal-thumbnail').forEach(thumb => thumb.classList.remove('active-thumb'));
+                    img.classList.add('active-thumb');
+                });
+                modalThumbnailGallery.appendChild(img);
+            }
+
+            // Load Sizes
+            product.sizes.forEach(size => {
+                const sizeDiv = document.createElement('div');
+                sizeDiv.classList.add('modal-size-option');
+                sizeDiv.textContent = size;
+                sizeDiv.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-size-option').forEach(opt => opt.classList.remove('selected-size'));
+                    sizeDiv.classList.add('selected-size');
+                    // You can store the selected size in a variable or state management
+                    console.log(`Selected size for ${product.name}: ${size}`);
+                });
+                modalSizeOptions.appendChild(sizeDiv);
+            });
+
+            productDetailModal.style.display = 'flex'; // Show the modal
+            document.body.style.overflow = 'hidden'; // Prevent scrolling on body when modal is open
+        }
+
+        // Event listener for product images to open the modal
+        document.querySelectorAll('.product-item img').forEach(img => {
+            img.addEventListener('click', function() {
+                const productDiv = this.closest('.product-item');
+                const productId = productDiv.dataset.id;
+                openProductModal(productId);
+            });
+        });
+
+        // Event listener to close the modal
+        closeButton.addEventListener('click', () => {
+            productDetailModal.style.display = 'none'; // Hide the modal
+            document.body.style.overflow = ''; // Restore body scrolling
+        });
+
+        // Close modal if user clicks outside of modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === productDetailModal) {
+                productDetailModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close the modal when the ESC key is pressed
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && productDetailModal.style.display === 'flex') {
+                productDetailModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        // --- Add to Cart Message Functionality ---
+        const addToCartMessage = document.getElementById('addToCartMessage');
+        const messageText = document.getElementById('messageText');
+
+        // Event listener for "Add to Cart" buttons on the product grid
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent the click from bubbling up to the product-item and opening the modal
+                const productItem = this.closest('.product-item');
+                const productName = productItem ? productItem.dataset.name : 'Item';
+
+                messageText.textContent = `${productName} added to cart successfully!`;
+                addToCartMessage.classList.add('show');
+
+                setTimeout(() => {
+                    addToCartMessage.classList.remove('show');
+                }, 3000);
+            });
+        });
+
+        // Event listener for "Add to Cart" button inside the modal
+        const modalAddToCartBtn = document.querySelector('.modal-add-to-cart-btn');
+        if (modalAddToCartBtn) {
+            modalAddToCartBtn.addEventListener('click', function() {
+                const productName = modalProductName.textContent; // Get name from modal's h2
+
+                messageText.textContent = `${productName} added to cart successfully!`;
+                addToCartMessage.classList.add('show');
+
+                // Close the modal after a short delay (e.g., 500ms) to allow message to be seen
+                setTimeout(() => {
+                    productDetailModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    addToCartMessage.classList.remove('show'); // Ensure message is hidden
+                }, 500); // Close modal quickly after showing message
+            });
+        }
+
+    </script>
+</body>
+</html>
